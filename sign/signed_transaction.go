@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
-	"github.com/scorum/bitshares-go/encoding/transaction"
-	"github.com/scorum/bitshares-go/types"
+	"fmt"
+	"github.com/woyoutlz/bitshares-go/encoding/transaction"
+	"github.com/woyoutlz/bitshares-go/types"
 	"log"
 
 	"github.com/btcsuite/btcd/btcec"
-	"github.com/btcsuite/btcutil"
 	"github.com/pkg/errors"
 )
 
@@ -71,13 +71,16 @@ func (tx *SignedTransaction) Sign(wifs []string, chain string) error {
 
 	privKeys := make([]*btcec.PrivateKey, len(wifs))
 	for index, wif := range wifs {
-		w, err := btcutil.DecodeWIF(wif)
-		if err != nil {
-			return err
-		}
-		privKeys[index] = w.PrivKey
+		//w, err := btcutil.DecodeWIF(wif)
+		//if err != nil {
+		//	return err
+		//}
+		//privKeys[index] = w.PrivKey
+		fmt.Println(wif)
+		bbs,_ := hex.DecodeString(wif)
+		privKey, _ := btcec.PrivKeyFromBytes(btcec.S256(), bbs)
+		privKeys[index] = privKey
 	}
-
 	// Set the signature array in the transaction.
 	sigsHex := make([]string, len(privKeys))
 	for index, privKey := range privKeys {

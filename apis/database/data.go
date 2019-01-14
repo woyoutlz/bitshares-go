@@ -2,7 +2,7 @@ package database
 
 import (
 	"encoding/json"
-	"github.com/scorum/bitshares-go/types"
+	"github.com/woyoutlz/bitshares-go/types"
 )
 
 type Asset struct {

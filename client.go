@@ -2,16 +2,17 @@ package bitshares
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/pkg/errors"
-	"github.com/scorum/bitshares-go/apis/database"
-	"github.com/scorum/bitshares-go/apis/history"
-	"github.com/scorum/bitshares-go/apis/login"
-	"github.com/scorum/bitshares-go/apis/networkbroadcast"
-	"github.com/scorum/bitshares-go/caller"
-	"github.com/scorum/bitshares-go/sign"
-	"github.com/scorum/bitshares-go/transport/websocket"
-	"github.com/scorum/bitshares-go/types"
+	"github.com/woyoutlz/bitshares-go/apis/database"
+	"github.com/woyoutlz/bitshares-go/apis/history"
+	"github.com/woyoutlz/bitshares-go/apis/login"
+	"github.com/woyoutlz/bitshares-go/apis/networkbroadcast"
+	"github.com/woyoutlz/bitshares-go/caller"
+	"github.com/woyoutlz/bitshares-go/sign"
+	"github.com/woyoutlz/bitshares-go/transport/websocket"
+	"github.com/woyoutlz/bitshares-go/types"
 	"log"
 	"time"
 )
@@ -86,21 +87,42 @@ func (client *Client) Close() error {
 }
 
 // Transfer a certain amount of the given asset
-func (client *Client) Transfer(key string, from, to types.ObjectID, amount, fee types.AssetAmount) error {
+func (client *Client) Transfer(key string, from, to types.ObjectID, amount, fee types.AssetAmount)  (string, error) {
 	op := types.NewTransferOperation(from, to, amount, fee)
 
 	fees, err := client.Database.GetRequiredFee([]types.Operation{op}, fee.AssetID.String())
 	if err != nil {
 		log.Println(err)
-		return errors.Wrap(err, "can't get fees")
+		return "",errors.Wrap(err, "can't get fees")
 	}
 	op.Fee.Amount = fees[0].Amount
 
 	stx, err := client.sign([]string{key}, op)
 	if err != nil {
-		return err
+		return "",err
 	}
-	return client.broadcast(stx)
+	//return client.broadcast(stx)
+	result, err := client.broadcastSync(stx)
+	if err != nil {
+		return "", err
+	}
+
+	res := result.Trx["operation_results"]
+	ops, ok := res.([]interface{})
+	fmt.Println(result)
+	if !ok {
+		return "", errors.New("invalid result format")
+	}
+	create_op, ok := ops[0].([]interface{})
+	if !ok {
+		return "", errors.New("invalid result format")
+	}
+	id, ok := create_op[1].(string)
+	if !ok {
+		return "", errors.New("invalid result format")
+	}
+
+	return id, err
 }
 
 func (client *Client) LimitOrderCreate(key string, seller types.ObjectID, fee, amToSell, minToRecive types.AssetAmount, expiration time.Duration, fillOrKill bool) (string, error) {

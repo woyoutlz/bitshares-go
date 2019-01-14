@@ -1,7 +1,7 @@
 package bitshares
 
 import (
-	"github.com/scorum/bitshares-go/types"
+	"github.com/woyoutlz/bitshares-go/types"
 	"github.com/stretchr/testify/require"
 	"log"
 	"testing"

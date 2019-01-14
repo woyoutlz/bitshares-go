@@ -2,9 +2,9 @@ package database
 
 import (
 	"encoding/json"
-	"github.com/scorum/bitshares-go/apis/login"
-	"github.com/scorum/bitshares-go/transport/websocket"
-	"github.com/scorum/bitshares-go/types"
+	"github.com/woyoutlz/bitshares-go/apis/login"
+	"github.com/woyoutlz/bitshares-go/transport/websocket"
+	"github.com/woyoutlz/bitshares-go/types"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"

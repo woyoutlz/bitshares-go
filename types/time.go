@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/scorum/bitshares-go/encoding/transaction"
+	"github.com/woyoutlz/bitshares-go/encoding/transaction"
 	"time"
 )
 
